@@ -94,6 +94,53 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>& prefix, const std::vector<std::vector<char> >& board, 
 								   std::string word, std::set<std::string>& result, unsigned int r, unsigned int c, int dr, int dc)
 {
-//add your solution here!
+    // check if we are in bounds
+    if (r >= board.size() || c >= board[0].size()) {
+        return false;
+    }
 
+    // add the word to the board 
+    word += board[r][c];
+
+    // if word is not a prefix AND not a word then end recursion
+    if (prefix.find(word) == prefix.end() && dict.find(word) == dict.end()) 
+    {
+        return false;
+    }
+
+    bool found = false;
+
+    // var to keep track of the longest word so far 
+    std::string longest = "";
+
+    unsigned int next_r = r + dr;
+    unsigned int next_c = c + dc;
+
+    if (next_r < board.size() && next_c < board[0].size()) 
+    {
+        // move to the next 
+        std::set<std::string> temp;
+
+        // recursive call 
+        boggleHelper(dict, prefix, board, word, temp, next_r, next_c, dr, dc);
+
+        // search deeper 
+        for (const std::string& word_ : temp) {
+            if (word_.length() > longest.length()) {
+                longest = word_;
+            }
+        }
+        found = !temp.empty();
+    }
+
+    // if word is valid and longer than longest word, insert into result 
+    if (dict.find(word) != dict.end() && word.length() >= longest.length()) {
+        result.insert(word);
+        found = true;
+    }
+    else if (!longest.empty()) {
+        result.insert(longest);
+    }
+
+    return found;
 }
